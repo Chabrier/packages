@@ -16,6 +16,14 @@
 </dynamics>
 <experiment name="SimpleEquation" duration="10.000000000000000" begin="0.000000000000000" combination="linear"  >
 <conditions>
+  <condition name="simulation_engine">
+    <port name="begin">
+      <double>0.</double>
+    </port>
+    <port name="duration">
+      <double>10.</double>
+      </port>"
+  </condition>
 <condition name="cond" >
  <port name="timeStep" >
 <double>1.000000000000000</double>
