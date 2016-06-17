@@ -28,13 +28,16 @@
 #include <QWidget>
 #include <QObject>
 #include <QDebug>
+#include <QGroupBox>
 #include <vle/gvle/vlevpm.h>
 #include <vle/gvle/plugin_mainpanel.h>
+#include "vle/gvle/gvle_widgets.h"
 
 #include "DiscreteTimeLeftWidget.h"
 #include "DiscreteTimeRightWidget.h"
 #include "vlesmdt.h"
 
+namespace vv = vle::value;
 
 namespace vle {
 namespace gvle {
@@ -58,11 +61,24 @@ public:
     void init(QString& file, utils::Package* pkg, Logger* ,gvle_plugins*);
     QString canBeClosed();
     void save();
+    void discard();
     PluginMainPanel* newInstance();
 
     VleTextEdit* getComputeWidget();
+    VleTextEdit* getConstructorWidget();
+    VleTextEdit* getUserSectionWidget();
+    VleTextEdit* getIncludesWidget();
+    VleDoubleEdit* getTimeStepWidget();
+    QGroupBox* getTimeStepBox();
     void reload();
     void insertTextEdit(int row, int col, const QString& val);
+    void insertBooleanIn(int row, int col, bool val);
+    void insertBooleanOut(int row, int col, bool val);
+    void insertBooleanObs(int row, int col, bool val);
+    void insertBooleanParam(int row, int col, bool val);
+    void insertSpinBoxDim(int row, int col, int val);
+    void insertSpinBoxHistory(int row, int col, int val);
+    void insertSpinBoxSync(int row, int col, int val);
     VleTextEdit* getTextEdit(int row, int col);
 
 public slots:
@@ -70,16 +86,35 @@ public slots:
     void onUndoAvailable(bool);
     //for left widget
     void onComputeChanged(const QString& id, const QString& old,
-            const QString& newVal);
+			  const QString& newVal);
+    void onConstructorChanged(const QString& id, const QString& old,
+			      const QString& newVal);
+    void onUserSectionChanged(const QString& id, const QString& old,
+			      const QString& newVal);
+    void onIncludesChanged(const QString& id, const QString& old,
+			   const QString& newVal);
+    void onParamTimeStep(bool checked);
+    void onTimeStepUpdated(const QString& /* id */, double val);
     void onTableVarsMenu(const QPoint&);
     void onModified();
     void onUndoRedoSm(QDomNode oldValSm, QDomNode newValSm);
     void onSetCompute();
+    void onSetConstructor();
+    void onSetUserSection();
+    void onSetIncludes();
     //for right widget
-    void onTextUpdated(const QString&, const QString&, const QString&);
+    void onTextUpdated(const QString& id, const QString& oldname,
+		       const QString& newname);
     void onSelected(const QString&);
-    void onAllowInitialValue(int state);
-    void onInitialValue(double val);
+    void onInitialValue(const QString& id, double val);
+    void onIn(const QString& id, bool val);
+    void onOut(const QString& id, bool val);
+    void onObs(const QString& id, bool val);
+    void onParam(const QString& id, bool val);
+    void onValUpdated(const vle::value::Value& newVal);
+    void onHistoryUpdated(const QString& id, int val);
+    void onDimUpdated(const QString& id, int val);
+    void onSyncUpdated(const QString& id, int val);
 
 private:
     void updateConfigVar();
