@@ -386,6 +386,9 @@ void SimPlot::simulationGetStep()
             {
                 QString portName;
                 vle::value::Value *vHead = mat->get(i, 0);
+                if (vHead == NULL) {
+                    break;
+                }
                 QString colHeader = QString(vHead->toString().value().c_str());
                 QStringList list1 = colHeader.split(":");
                 if (list1.size() > 1)
@@ -394,6 +397,8 @@ void SimPlot::simulationGetStep()
                     portName = colHeader;
                 portNames.append(portName);
             }
+
+            uint nbColumns = i;
 
             for (i = mViewLastRow.value(matViewName); i < mat->rows(); i++)
             {
@@ -408,7 +413,7 @@ void SimPlot::simulationGetStep()
                     continue;
                 }
 
-                for (uint j = 1; j < mat->columns(); j++)
+                for (uint j = 1; j < nbColumns; j++)
                 {
                     vle::value::Value *vCell;
                     QString portName = portNames.at(j);
