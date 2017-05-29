@@ -22,27 +22,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GVLE_DECISION_PANEL_H
-#define GVLE_DECISION_PANEL_H
+#ifndef GVLE_DECISION_H
+#define GVLE_DECISION_H
 
 #include <QWidget>
 #include <QObject>
 #include <QDebug>
-#include <vle/gvle/vlevpm.h>
+//#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.hpp>
 #include <vle/gvle/plugin_mainpanel.h>
 #include <vle/gvle/gvle_file.h>
 
-//#include "DataDummyLeftWidget.h"
-//#include "DataDummyRightWidget.h"
 #include "vledmdd.h"
+#include "DecisionLeftWidget.h"
+//#include "DataDummyRightWidget.h"
 
 
-namespace vle {
 namespace gvle {
+namespace decision {
 
-class VleTextEdit;
+//class VleTextEdit;
 
-class DecisionPanel : public PluginMainPanel
+class DecisionPanel : public vle::gvle::PluginMainPanel
 {
     Q_OBJECT
     Q_INTERFACES(vle::gvle::PluginMainPanel)
@@ -56,12 +57,13 @@ public:
     QWidget* rightWidget();
     void undo();
     void redo();
-    void init(const gvle_file& file, utils::Package* pkg, Logger*,
-	      gvle_plugins* plug, const utils::ContextPtr& ctx);
+    void init(const vle::gvle::gvle_file& file, vle::utils::Package* pkg, vle::gvle::Logger*,
+	      vle::gvle::gvle_plugins* plug, const vle::utils::ContextPtr& ctx);
     QString canBeClosed();
     void save();
     void discard() {};
     PluginMainPanel* newInstance();
+    void reload();
 
 public slots:
     //for both left and right
@@ -71,9 +73,10 @@ public slots:
 private:
 
 public:
-    QTextEdit*  m_edit;
-    QString     m_file;
-    vleDmDD*    dataMetadata;
+    DecisionLeftWidget* left;
+    //QTextEdit*  m_edit;
+    QString             m_file;
+    vleDmDD*            dataMetadata;
 };
 
 }} //namespaces

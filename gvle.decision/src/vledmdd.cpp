@@ -27,10 +27,16 @@
 #include <QtXml/QDomNode>
 
 #include <vle/utils/Template.hpp>
+
+#include <vle/gvle/vlevpz.hpp>
+
 #include "vledmdd.h"
 
-namespace vle {
 namespace gvle {
+namespace decision {
+
+using namespace vle::gvle;
+namespace vv = vle::value;
 
 vleDomDmDD::vleDomDmDD(QDomDocument* doc): DomObject(doc)
 
@@ -48,6 +54,7 @@ vleDomDmDD::getXQuery(QDomNode node)
 {
     QString name = node.nodeName();
     if ((name == "dataModel") or
+        (name == "dataPlugin") or
         (name == "dynamic")) {
         return getXQuery(node.parentNode())+"/"+name;
     }
@@ -93,7 +100,9 @@ vleDomDmDD::getNodeFromXQuery(const QString& query,
     }
 
     //handle recursion with uniq node
-    if ((curr == "dataModel") or (curr == "dynamic")){
+    if ((curr == "dataModel") or
+        (curr == "datPlugin") or
+        (curr == "dynamic")){
         return getNodeFromXQuery(rest, DomFunctions::obtainChild(d, curr, mDoc));
     }
     return QDomNode();
@@ -153,8 +162,10 @@ vleDmDD::xCreateDom()
         vpmRoot.setAttribute("version", "1.x");
         // Save the author name (if known)
         vpmRoot.setAttribute("author", "meto");
-        QDomElement xCondPlug = mDocDm->createElement("dataModel");
-        vpmRoot.appendChild(xCondPlug);
+        QDomElement xCondDataMod = mDocDm->createElement("dataModel");
+        QDomElement xCondDataPlug = mDocDm->createElement("dataPlugin");
+        vpmRoot.appendChild(xCondDataPlug);
+        vpmRoot.appendChild(xCondDataMod);
 
         QDomElement xElem;
 
@@ -207,10 +218,58 @@ vleDmDD::setClassNameToDoc(const QString& className, bool snap)
     dynamicNode.toElement().setAttribute("name", "dyn" + className);
     dynamicNode.toElement().setAttribute("library", className);
 
+    if (snap) {
+        emit modified(OTHER);
+    }
+}
+void
+vleDmDD::setPluginNameToDoc(const QString& plugName, bool snap)
+{
+    QDomNode rootNode = mDocDm->documentElement();
+
+    if (snap) {
+        undoStackDm->snapshot(rootNode);
+    }
+
+    QDomNode dataModelNode =
+        mDocDm->elementsByTagName("dataPlugin").item(0);
+    dataModelNode.toElement().setAttribute("name", plugName);
+
+    if (snap) {
+        emit modified(OTHER);
+    }
+}
+
+void
+vleDmDD::setDataNameToDoc(const QString& dataName, bool snap)
+{
+    QDomNode rootNode = mDocDm->documentElement();
+
+    if (snap) {
+        undoStackDm->snapshot(rootNode);
+    }
+
     QDomNode dataModelNode =
         mDocDm->elementsByTagName("dataModel").item(0);
+    dataModelNode.toElement().setAttribute("conf", dataName);
 
-    dataModelNode.toElement().setAttribute("conf", className);
+    if (snap) {
+        emit modified(OTHER);
+    }
+}
+
+void
+vleDmDD::setDataPackageToDoc(const QString& pacName, bool snap)
+{
+    QDomNode rootNode = mDocDm->documentElement();
+
+    if (snap) {
+        undoStackDm->snapshot(rootNode);
+    }
+
+    QDomNode dataModelNode =
+        mDocDm->elementsByTagName("dataModel").item(0);
+    dataModelNode.toElement().setAttribute("package", pacName);
 
     if (snap) {
         emit modified(OTHER);
@@ -231,7 +290,7 @@ vleDmDD::setPackageToDoc(const QString& nm, bool snap)
     dynamicNode.toElement().setAttribute("package", nm);
 
     QDomNode dataModelNode =
-        mDocDm->elementsByTagName("dataModel").item(0);
+        mDocDm->elementsByTagName("dataPlugin").item(0);
 
     dataModelNode.toElement().setAttribute("package", nm);
 

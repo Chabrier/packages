@@ -25,25 +25,32 @@
 #include <QMenu>
 #include <vle/gvle/gvle_widgets.h>
 
+#include "vledmdd.h"
 #include "DecisionPanel.h"
 //#include "ui_leftWidget.h"
 //#include "ui_rightWidget.h"
 
-namespace vle {
 namespace gvle {
+namespace decision {
+
+namespace vv = vle::value;
+using namespace vle::gvle;
 
 DecisionPanel::DecisionPanel():
-    PluginMainPanel(),  m_edit(0), m_file(""), dataMetadata(0)
+//    PluginMainPanel(),  m_edit(0), m_file(""), dataMetadata(0)
+    PluginMainPanel(),  left(0), m_file(""), dataMetadata(0)
 {
-    m_edit = new QTextEdit();
-    QObject::connect(m_edit, SIGNAL(undoAvailable(bool)),
-                     this, SLOT(onUndoAvailable(bool)));
+    //m_edit = new QTextEdit();
+    //QObject::connect(m_edit, SIGNAL(undoAvailable(bool)),
+    //                 this, SLOT(onUndoAvailable(bool)));
+
+    left = new DecisionLeftWidget(this);
 }
 
 DecisionPanel::~DecisionPanel()
 {
     //delete right;
-    //delete left;
+    delete left;
 }
 
 QString
@@ -55,7 +62,7 @@ DecisionPanel::getname()
 QWidget*
 DecisionPanel::leftWidget()
 {
-    return m_edit;
+    return left;
 }
 
 QWidget*
@@ -68,13 +75,13 @@ void
 DecisionPanel::undo()
 {
     dataMetadata->undo();
-    //reload();
+    reload();
 }
 void
 DecisionPanel::redo()
 {
     dataMetadata->redo();
-    //reload();
+    reload();
 }
 
 void
@@ -88,7 +95,16 @@ DecisionPanel::init(const gvle_file& gf, vle::utils::Package* pkg, Logger*,
                                gf.metadata_file, getname());
     dataMetadata->setPackageToDoc("vle.discrete-time.decision", false);
     dataMetadata->setClassNameToDoc("agentDTG", false);
+    dataMetadata->setPluginNameToDoc(getname(), false);
+    dataMetadata->setDataNameToDoc(gf.baseName(), false);
+    dataMetadata->setDataPackageToDoc(pkg->name().c_str(), false);
     dataMetadata->save();
+
+    QObject::connect(dataMetadata, SIGNAL(undoAvailable(bool)),
+                     this, SLOT(onUndoAvailable(bool)));
+
+    QObject::connect(dataMetadata, SIGNAL(modified (int)),
+            left, SLOT(onDmModified(int)));
 
     QFile dataFile (m_file);
 
@@ -97,8 +113,8 @@ DecisionPanel::init(const gvle_file& gf, vle::utils::Package* pkg, Logger*,
     }
 
     QTextStream in(&dataFile);
-    m_edit->setText(in.readAll());
-
+    //m_edit->setText(in.readAll());
+    reload();
 }
 
 QString
@@ -115,7 +131,8 @@ DecisionPanel::save()
     if (m_file != "") {
         QFile file(m_file);
         if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-            file.write(m_edit->toPlainText().toStdString().c_str()) ;
+            //file.write(m_edit->toPlainText().toStdString().c_str()) ;
+            file.write("coucou") ;
             file.flush();
             file.close();
         }
@@ -127,6 +144,13 @@ PluginMainPanel*
 DecisionPanel::newInstance()
 {
     return new DecisionPanel;
+}
+
+void
+DecisionPanel::reload()
+{
+    left->reload();
+    //right->reload();
 }
 
 void

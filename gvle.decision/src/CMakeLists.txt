@@ -13,16 +13,17 @@ LINK_DIRECTORIES(${Boost_LIBRARY_DIRS} ${VLE_LIBRARY_DIRS}
   ${GVLE_LIBRARY_DIRS})
 
 SET(decision_SOURCES DecisionPanel.cpp
+  DecisionLeftWidget.cpp
   vledmdd.cpp
 )
 
-#QT5_WRAP_UI(ui_leftWidget_h leftWidget.ui)
+QT5_WRAP_UI(ui_leftWidget_h leftWidget.ui)
 #QT5_WRAP_UI(ui_rightWidget_h rightWidget.ui)
 
 ADD_DEFINITIONS(-DQT_PLUGIN)
 
-add_library(decision SHARED ${decision_SOURCES})
-#  ${ui_leftWidget_h} ${ui_rightWidget_h})
+add_library(decision SHARED ${decision_SOURCES} ${ui_leftWidget_h})
+#${ui_rightWidget_h})
 
 add_definitions(${Qt5Widgets_DEFINITIONS} ${Qt5Xml_DEFINITIONS}
   ${Qt5Gui_DEFINITIONS})

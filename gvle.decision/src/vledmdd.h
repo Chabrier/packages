@@ -40,8 +40,8 @@
 #include <vle/value/Map.hpp>
 #include <vle/gvle/dom_tools.hpp>
 
-namespace vle {
 namespace gvle {
+namespace decision {
 
 enum MODIF_TYPE
 {
@@ -86,8 +86,10 @@ public:
     void setCurrentTab(QString tabName);
 
     void setClassNameToDoc(const QString& className, bool snap);
+    void setPluginNameToDoc(const QString& plugName, bool snap);
+    void setDataNameToDoc(const QString& dataName, bool snap);
+    void setDataPackageToDoc(const QString& pacName, bool snap);
     void setPackageToDoc(const QString& nm, bool snap);
-
 
     void save();
 
